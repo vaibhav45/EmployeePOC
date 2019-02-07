@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <link rel="stylesheet" type="text/css" href="WEB-INF/CSS/registration.css">
+
+</head>
+<body>
+    <section class="head">
+        <!-- header  -->
+            <header>
+                <h2> THE ONE </h2>
+                <p id="tag">where your first step starts</p>
+            </header>
+        </section>
+        <!--section 2  -->
+            <section id="feilds">
+                <p> please enter following blanks </p>
+                <div class="feilds1"> 
+                <form action="create" method="post" modelAttribute="employee">
+               
+                <label for="firstname"><b>First Name:</b></label>  &nbsp;&nbsp; &nbsp;
+                 <input type="text" name="FirstName" placeholder="FirstName"  maxlength="25"> &nbsp;&nbsp; &nbsp;&nbsp;
+                  &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; 
+                 <label for="lastname"><b>Last Name:</b></label>&nbsp;	
+                 <input type="text" name="LastName" placeholder="lastName" maxlength="25"><br><br>
+                
+                <label for="dateofbirth"><b>Date Of Birth:</b></label>	
+                <input type="text" name="DateOfBirth" placeholder="yyyy-mm-dd"> &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
+                
+                <label for="mobile"><b> Contact:</b></label>
+                <input type="text" name="Contact" placeholder="contact" maxlength="10"><br><br>
+                <label for="email"><b>	Email:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></label>
+                <input type="email" name="Email" placeholder="email" >	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;	
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <label for="address"><b> Address:</b></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="text" name="Address" >
+                <br><br>
+                 <button type="submit" class="registerbtn">Register</button>
+                 </form>
+                </div>
+                
+                </section>
+        
+</body>
+</html>
