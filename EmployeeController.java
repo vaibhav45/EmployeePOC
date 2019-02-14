@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.psl.employee.model.Education;
@@ -22,6 +24,9 @@ import com.psl.employee.service.IEmpProfessionalService;
 
 @RestController
 //@RequestMapping("employee")
+
+@SessionAttributes("empi")
+//@SessionAttributes("education")
 public class EmployeeController {
 	
 
@@ -38,12 +43,6 @@ public class EmployeeController {
 		this.employeeService = employeeService;
 	}
 
-/*	@RequestMapping(value="/create",method = RequestMethod.POST)
-	public ModelAndView create(@ModelAttribute("employee") Employee employee ) {
-		employeeService.create(employee);
-		return new ModelAndView("redirect:/login");
-		
-	}*/
 	
 	@RequestMapping(value="/create",method = RequestMethod.POST)
 	public ModelAndView create(@RequestParam("firstname")String firstName,
@@ -92,33 +91,18 @@ public class EmployeeController {
 	}
 	
 	
-	//  getting employee by id original
-	/*@RequestMapping(value="/edit/{emp_ID}", method = RequestMethod.GET, headers = "Accept=application/json")
-	public String edit(@PathVariable int emp_ID,Model m) {
-		Employee emp = employeeService.getEmpById(emp_ID);
-		//ModelAndView model = new ModelAndView("update");
-		m.addAttribute("employee",emp);
-		return emp ;
-	}
-	*/
+	
 	
 		// Get  Employee BY ID URl
 	@RequestMapping(value="/edit/{emp_ID}", method = RequestMethod.GET, headers = "Accept=application/json")
-	public Employee edit(@PathVariable int emp_ID,Model m) {
-//		Employee emp = employeeService.getEmpById(emp_ID); //List<Employee> l = new ArrayList<Employee>(); 
+	public Employee edit(@PathVariable int emp_ID,Model m) {	
 		Employee emp =employeeService.getEmpById(emp_ID);
-//		l.add(emp);//ModelAndView model = new ModelAndView("update");
-//		m.addAttribute("employee",emp);
+
 		return emp ;
 	}
 	
 	
-	/*@RequestMapping(value="/editSave",method = RequestMethod.POST)    
-    public String editsave(@ModelAttribute("employee") Employee employee){    
-		employeeService.update(employee);    
-        return "redirect:/employees";    
-    }    
-	*/
+	
 	
 		// Update Employee URL
 	@RequestMapping(value="/editsave",method = RequestMethod.POST)
@@ -170,22 +154,22 @@ public class EmployeeController {
 		return new ModelAndView("edudetails");
 	}
 	@RequestMapping(value="/inserteducationdetails",method=RequestMethod.POST)
-	public ModelAndView insertEduc(@RequestParam("empid") int emp_ID,
-			@RequestParam("sscschool") String ssc_SchoolName,
-	@RequestParam("sscgrade") float ssc_grade,
-	@RequestParam("sscyearofpass") int ssc_YearOfPass,
-	@RequestParam("intercollege") String inter_CollegeName,
-	@RequestParam("intergrade") float inter_grade,
-	@RequestParam("interyearofpass") int inter_YearOfPass,
-	@RequestParam("ugcollege") String ug_CollegeName,
-	@RequestParam("uggrade") float ug_grade,
-	@RequestParam("ugyearofpass") int ug_YearOfPass,
-	@RequestParam("pgcollege") String pg_CollegeName,
-	@RequestParam("pggrade") float pg_grade,
-	@RequestParam("pgyearofpass") int pg_YearOfPass) {
+	public ModelAndView insertEduc(@SessionAttribute("empi")Employee employee,
+			@RequestParam("ssc_SchoolName") String ssc_SchoolName,
+	@RequestParam("ssc_grade") float ssc_grade,
+	@RequestParam("ssc_YearOfPass") int ssc_YearOfPass,
+	@RequestParam("inter_CollegeName") String inter_CollegeName,
+	@RequestParam("inter_grade") float inter_grade,
+	@RequestParam("inter_YearOfPass") int inter_YearOfPass,
+	@RequestParam("ug_CollegeName") String ug_CollegeName,
+	@RequestParam("ug_grade") float ug_grade,
+	@RequestParam("ug_YearOfPass") int ug_YearOfPass,
+	@RequestParam("pg_CollegeName") String pg_CollegeName,
+	@RequestParam("pg_grade") float pg_grade,
+	@RequestParam("pg_YearOfPass") int pg_YearOfPass) {
 		
 		Education edu= new Education();
-		edu.setEmp_ID(emp_ID);
+		edu.setEmp_ID(employee.getEmp_ID());
 		edu.setSsc_SchoolName(ssc_SchoolName);
 		edu.setSsc_grade(ssc_grade);
 		edu.setSsc_YearOfPass(ssc_YearOfPass);
@@ -198,84 +182,59 @@ public class EmployeeController {
 		edu.setPg_CollegeName(pg_CollegeName);
 		edu.setPg_grade(pg_grade);
 		edu.setPg_YearOfPass(pg_YearOfPass);
-		System.out.println("emp_ID" + emp_ID);
 		educationService.insert(edu);
 		return new ModelAndView("redirect:/profile");
 		
 	}
 	
-//	@RequestMapping(value="/updateEducation",method)
-	
-	/*@RequestMapping(value="/vieweducation/{emp_ID}", method = RequestMethod.GET, headers = "Accept=application/json")
-	public ModelAndView view(@PathVariable int emp_ID,Model m) {
-		Education edu = educationService.getDetails(emp_ID);
-		ModelAndView model = new ModelAndView("education");
-		model.addObject("education",edu);
-		return model;
-	}*/
+
 
 	@RequestMapping(value="/details",method=RequestMethod.GET)
-	public ModelAndView login2(@RequestParam("empid") int empid, Model model,Education edu) {
+	public ModelAndView login2(@SessionAttribute("empi")Employee employee) {
+		int eduid = 0;
+		List<Education> empList=educationService.employeeEduDetails(employee.getEmp_ID());
+//		System.out.println(empList.toString());
+		for(Education e : empList) {
+		eduid = e.getEmp_Edu_ID();
+		}
+//		System.out.println(id2);
+		ModelAndView model=new ModelAndView();
+//		List<Education> empList=request.getAttributeNames();
 		
-		int m=educationService.validate(empid);
-		
-//		System.out.println("Data" +m);
-		
-		
-//		System.out.println(m);
-		if(m==2) 
-		{
-		List<Education> empList=educationService.employeeEduDetails(empid);
-		System.out.println(empList);
-		model.addAttribute("empi", empList);
-		return new ModelAndView("edudetails");
+		if(eduid != 0) {
+		model.setViewName("edudetails");
+		model.addObject("empd", empList);
 		}
 		else {
-			return new ModelAndView("education");
+			model.setViewName("education");
 		}
+		return model;
 	}
-	@RequestMapping(value = "/eduupdate", method = RequestMethod.GET)
+	@RequestMapping(value = "/eduupdate2", method = RequestMethod.GET)
 	public ModelAndView details(Model model) {
 //		model.addAttribute("employee" ,new Employee());
-		return new ModelAndView("eduupdate");
+		return new ModelAndView("eduupdate2");
 	}
 	
 	 @RequestMapping(value = "/vieweducation/{emp_ID}")
-	    public ModelAndView editEmployee(@ModelAttribute("education") Education education , 
-	    @PathVariable("emp_ID") int empid)
+	    public ModelAndView editEmployee(@SessionAttribute("empi")Employee employee)
 	    {
-	        ModelAndView model = new ModelAndView("eduupdate");
-	        
-	        Education edu = educationService.getDetails(empid);
-	       
-//	        List<Education> employeeList = educationService.EduDetails();
-	        
-//	        model.addObject("education",edu);        
-	        model.addObject("empi",edu);
-	        
+		 Education edu = educationService.getDetails(employee.getEmp_ID());
+		 System.out.println(edu.getInter_CollegeName());
+	        ModelAndView model = new ModelAndView("eduupdate2");        
+	        model.addObject("employ",edu);	      
 	        return model;
 	    }
-	/* @RequestMapping(value="/vieweducation/{emp_ID}",method = RequestMethod.GET, headers = "Accept=application/json")    
-	    public ModelAndView view(@PathVariable int empid){    
-		 Education edu = educationService.getDetails(empid);  
-		 ModelAndView model = new ModelAndView("education");
-//		 System.out.println(edu);1
-//		 model.setViewName("education");
-	     model.addObject("empi",edu);
-	     return model;    
-	    }   */ 
+	
 	    /* It updates model object. */    
 	    @RequestMapping(value="/updateeducation",method = RequestMethod.POST)    
-	    public ModelAndView editsave(@ModelAttribute("education") Education education){    
+	    public ModelAndView editsave(@ModelAttribute("education") Education education,@SessionAttribute("empi")Employee employee){
+	        education.setEmp_ID(employee.getEmp_ID());
+	        System.out.println(education.getEmp_ID());
 	        educationService.update(education);    
 	        return new ModelAndView("redirect:/profile");    
 	    }    
 	
-	/*@RequestMapping(value="/updateeducation",method = RequestMethod.POST)    
-    public String updateEducation(@ModelAttribute("education") Education education){    
-        educationService.update(education);    
-        return "redirect:/success";    
-    }*/
 	
 	
 //	Employee Professional Controller	
@@ -296,37 +255,37 @@ public class EmployeeController {
 //		model.addAttribute("employee" ,new Employee());
 		return new ModelAndView("professionaldetails");
 	}
-
 	@RequestMapping(value="/profedetails",method=RequestMethod.GET)
-	public ModelAndView profe(@RequestParam("empid") int empid, Model model,Education edu) {
-		
-		int m=empProfService.validate(empid);
-		
-//		System.out.println("Data" +m);
-		
-		
-//		System.out.println(m);
-		if(m==2) 
-		{
-		List<EmployeeProfessional> empList=empProfService.employeeProfDetails(empid);
-		System.out.println(empList);
-		model.addAttribute("empi", empList);
-		return new ModelAndView("professionaldetails");
+	public ModelAndView profe(@SessionAttribute("empi")Employee employee) {
+		int eduid = 0;
+		List<EmployeeProfessional> empList=empProfService.employeeProfDetails(employee.getEmp_ID());
+//		System.out.println(empList.toString());
+		for(EmployeeProfessional e : empList) {
+		eduid = e.getEmpl_ID();
+		}
+//		System.out.println(id2);
+		ModelAndView model=new ModelAndView();		
+		if(eduid != 0) {
+		model.setViewName("professionaldetails");
+		model.addObject("empp", empList);		
 		}
 		else {
-			return new ModelAndView("professional");
+			model.setViewName("professional");
 		}
+		return model;
 	}
+
+
 	@RequestMapping(value="/insertprofessional", method=RequestMethod.POST, headers = "Accept=application/json")
 	
-		public ModelAndView insertEduc(@RequestParam("empid") int emp_ID,
-		@RequestParam("previouscompany") String previous_Company,
+		public ModelAndView insertEduc(@SessionAttribute("empi")Employee employee,
+		@RequestParam("previous_Company") String previous_Company,
 		@RequestParam("salary") long salary,
 		@RequestParam("role")  String role,
-		@RequestParam("yearsofexp") int yearsOfExp) {
+		@RequestParam("yearsOfExp") int yearsOfExp) {
 		
 		EmployeeProfessional empp= new EmployeeProfessional();
-		empp.setEmpl_ID(emp_ID);
+		empp.setEmpl_ID(employee.getEmp_ID());
 		empp.setPrevious_Company(previous_Company);
 		empp.setSalary(salary);
 		empp.setRole(role);
@@ -338,18 +297,21 @@ public class EmployeeController {
 }
 		
 	@RequestMapping(value="/viewprofessional/{empl_ID}", method = RequestMethod.GET, headers = "Accept=application/json")
-	public ModelAndView view2(@PathVariable("empl_ID") int empid) {
-		EmployeeProfessional pro = empProfService.getProfessional(empid);
+	public ModelAndView view2(@SessionAttribute("empi")Employee employee) {
+		 
+		EmployeeProfessional pro = empProfService.getProfessional(employee.getEmp_ID());
 		
 		ModelAndView model = new ModelAndView("profupdate");
 		
-		model.addObject("empi",pro);
+		model.addObject("empp",pro);
 //		model.setViewName("professional");
 		return model;
 	}
 	
 	@RequestMapping(value="/updateemployeeprofessional",method = RequestMethod.POST)    
-    public ModelAndView updateEmployeeProfessional(@ModelAttribute("employeeProfessional") EmployeeProfessional employeeProfessional){    
+    public ModelAndView updateEmployeeProfessional(@ModelAttribute("employeeProfessional") EmployeeProfessional employeeProfessional,
+    		@SessionAttribute("empi")Employee employee){ 
+		employeeProfessional.setEmpl_ID(employee.getEmp_ID());
         empProfService.update(employeeProfessional);    
         return new ModelAndView("redirect:/profile");    
     }  
@@ -360,21 +322,7 @@ public class EmployeeController {
 		return new ModelAndView("login");
 	}
 
-/*@RequestMapping(value="/login",method=RequestMethod.GET)
-public ModelAndView login2(@RequestParam("uname") String email,@RequestParam("psw") String lastName, Model model,Employee emp) {
-	
-	int m=employeeService.validate(email, lastName);
-	
-	 model.addAttribute("ID", emp.getEmp_ID());
-	
-//	System.out.println(m);
-	if(m==2) {
-	return new ModelAndView("home");
-	}
-	else {
-		return new ModelAndView("login");
-	}
-}*/
+
 	
 	
 	@RequestMapping(value="/login",method=RequestMethod.GET)
@@ -382,10 +330,7 @@ public ModelAndView login2(@RequestParam("uname") String email,@RequestParam("ps
 		
 		int m=employeeService.validate(email, lastName);
 		
-//		System.out.println("Data" +m);
-		
-		
-//		System.out.println(m);
+//		System.out.println("Data" +m);// System.out.println(m);
 		if(m==2) 
 		{
 		List<Employee> emplist=employeeService.employeedetails(email, lastName);
@@ -401,28 +346,28 @@ public ModelAndView login2(@RequestParam("uname") String email,@RequestParam("ps
 	
 		//Profile page
 
-@RequestMapping(value = "/profile", method = RequestMethod.GET)
-public ModelAndView profile(Model model) {
-//	model.addAttribute("employee" ,new Employee());
-	return new ModelAndView("profile");
-}
+		@RequestMapping(value = "/profile", method = RequestMethod.GET)
+		public ModelAndView profile(Model model) {
+//		model.addAttribute("employee" ,new Employee());
+		return new ModelAndView("profile");
+		}
 
-@RequestMapping(value = "/Test", method = RequestMethod.GET)
-public ModelAndView profile2(Model model) {
-//	model.addAttribute("employee" ,new Employee());
-	return new ModelAndView("Test");
-}
+			@RequestMapping(value = "/Test", method = RequestMethod.GET)
+			public ModelAndView profile2(Model model) {
+			//	model.addAttribute("employee" ,new Employee());
+			return new ModelAndView("Test");
+		}
 
-@RequestMapping(value = "/formedu", method = RequestMethod.GET)
-public ModelAndView eduformSerch(Model model) {
-	return new ModelAndView("formedu");
-}
-@RequestMapping(value = "/formprof", method = RequestMethod.GET)
-public ModelAndView profeSearch(Model model) {
-	return new ModelAndView("formProf");
-}
+		@RequestMapping(value = "/formedu", method = RequestMethod.GET)
+		public ModelAndView eduformSerch(Model model) {
+			return new ModelAndView("formedu");
+		}
+		@RequestMapping(value = "/formprof", method = RequestMethod.GET)
+		public ModelAndView profeSearch(Model model) {
+			return new ModelAndView("formProf");
+		}
 
-}
+	}	
 
 
 
